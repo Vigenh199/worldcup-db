@@ -8,7 +8,7 @@ else
 fi
 
 # Do not change code above this line. Use the PSQL variable above to query your database.
-echo -e "$($PSQL "TRUNCATE teams, games, games_teams;")\n"
+echo -e "$($PSQL "TRUNCATE teams, games;")\n"
 
 cat games.csv | while IFS="," read YEAR ROUND WINNER OPPONENT WGOALS OGOALS
 do
@@ -35,11 +35,5 @@ do
     fi
 
     INSERT_GAME_RESULT="$($PSQL "INSERT INTO games(year, round, winner_id, opponent_id, winner_goals, opponent_goals) VALUES($YEAR, '$ROUND', $WINNER_ID, $OPPONENT_ID, $WGOALS, $OGOALS) RETURNING game_id;")"
-
-    read GAME_ID <<< "$INSERT_GAME_RESULT"
-    echo Inserted into games: $WINNER $WGOALS:$OGOALS $OPPONENT
-    
-    INSERT_GAME_WINNER_RESULT=$($PSQL "INSERT INTO games_teams(game_id, team_id) VALUES($GAME_ID, $WINNER_ID);")
-    INSERT_GAME_OPPONENT_RESULT=$($PSQL "INSERT INTO games_teams(game_id, team_id) VALUES($GAME_ID, $OPPONENT_ID);")
   fi
 done
